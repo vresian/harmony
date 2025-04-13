@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
     <template class="HarmonyLoginWindow" parent="AdwApplicationWindow">
+        <style> <class name="login_window"/> </style>
         <property name="title">Login</property>
         <child>
             <object class="GtkLabel">
