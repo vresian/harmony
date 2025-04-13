@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <template class="HarmonyLoginWindow" parent="AdwApplicationWindow">
+        <property name="title">Login</property>
+        <child>
+            <object class="GtkLabel">
+                <property name="label">Hello World!</property>
+            </object>
+        </child>
+    </template>
+</interface>
