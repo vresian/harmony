@@ -34,7 +34,7 @@
                                         </child>
 
                                         <child>
-                                            <object class="AdwPasswordEntryRow">
+                                            <object class="AdwPasswordEntryRow" id="token_entry">
                                                 <property name="title">Authorization token</property>
                                                 <style> <class name="token_entry"/> </style>
                                             </object>
@@ -42,6 +42,7 @@
                                         
                                         <child>
                                             <object class="GtkButton" id="log_in_button">
+                                                <signal name="clicked" handler="handle_log_in_attempt" swapped="true"/>
                                                 <property name="label">Log in</property>
                                                 <style> <class name="log_in_button"/> </style>
                                             </object>
