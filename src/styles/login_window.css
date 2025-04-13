@@ -1,0 +1,23 @@
+.login_window .header_text {
+    font-weight: bold;
+    font-size: 150%;
+    margin-bottom: 16px;
+}
+
+.login_window .container {
+    padding: 32px;
+}
+
+.login_window .token_entry {
+    background-color: var(--window-bg-color);
+    border-radius: 8px;
+}
+
+.login_window .login_info_text {
+    margin-bottom: 32px;
+}
+
+.login_window .log_in_button {
+    margin-top: 24px;
+    padding: 12px 0;
+}

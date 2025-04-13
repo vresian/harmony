@@ -2,7 +2,7 @@ use adw::subclass::prelude::*;
 use gtk::{glib::{self, subclass::InitializingObject}, CompositeTemplate};
 
 #[derive(CompositeTemplate, Default)]
-#[template(resource = "/com/github/vresian/harmony/login_window/login_window.ui")]
+#[template(resource = "/com/github/vresian/harmony/login_window.ui")]
 pub struct LoginWindow {}
 
 #[glib::object_subclass]

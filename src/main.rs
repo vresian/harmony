@@ -1,6 +1,6 @@
-mod ui;
+mod logic;
 
-use ui::login_window::LoginWindow;
+use logic::login_window::LoginWindow;
 use adw::prelude::*;
 use adw::{Application, ApplicationWindow, gio, gtk::{CssProvider, gdk}};
 
@@ -14,7 +14,7 @@ fn build_ui(app: &Application) {
 
 fn load_css() {
     let provider = CssProvider::new();
-    provider.load_from_string(include_str!("css/login_window.css"));
+    provider.load_from_string(include_str!("styles/login_window.css"));
 
     gtk::style_context_add_provider_for_display(
         &gdk::Display::default().expect("Could not connect to a display"), 

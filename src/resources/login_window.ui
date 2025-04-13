@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <template class="HarmonyLoginWindow" parent="AdwApplicationWindow">
+        <style> <class name="login_window"/> </style>
+        <property name="title">Login</property>
+        <child>
+            <object class="AdwClamp">
+                <property name="maximum_size">600</property>
+                <child> 
+                    <object class="AdwPreferencesGroup">
+                        <property name="valign">center</property>
+                        <child>
+                            <object class="AdwPreferencesRow">
+                                <property name="activatable">False</property>
+                                <property name="focusable">False</property>
+
+                                <child>
+                                    <object class="GtkBox">
+                                        <property name="orientation">vertical</property>
+                                        <style> <class name="container"/> </style>
+
+                                        <child>
+                                            <object class="GtkLabel">
+                                                <property name="label">Welcome!</property>
+                                                <style> <class name="header_text"/> </style>
+                                            </object>
+                                        </child>
+
+                                        <child>
+                                            <object class="GtkLabel">
+                                                <property name="label">Currently the only login method supported is via the authorization token</property>
+                                                <style> <class name="login_info_text"/> </style>
+                                            </object>
+                                        </child>
+
+                                        <child>
+                                            <object class="AdwPasswordEntryRow">
+                                                <property name="title">Authorization token</property>
+                                                <style> <class name="token_entry"/> </style>
+                                            </object>
+                                        </child>
+                                        
+                                        <child>
+                                            <object class="GtkButton" id="log_in_button">
+                                                <property name="label">Log in</property>
+                                                <style> <class name="log_in_button"/> </style>
+                                            </object>
+                                        </child>
+                                    </object>
+                                </child>
+                            </object> 
+                        </child>
+                    </object> 
+                </child>
+            </object>
+        </child>
+    </template>
+</interface>
