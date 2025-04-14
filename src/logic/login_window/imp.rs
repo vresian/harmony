@@ -4,6 +4,7 @@ use adw::prelude::*;
 use adw::subclass::prelude::*;
 use gtk::{glib::{self, subclass::InitializingObject}, CompositeTemplate};
 use tokio::runtime::Runtime;
+use crate::logic::remember_account_dialog::{self, RememberAccountDialog};
 
 fn runtime() -> &'static Runtime {
     static RUNTIME: OnceLock<Runtime> = OnceLock::new();
@@ -93,6 +94,7 @@ impl LoginWindow {
         let spinner = adw::Spinner::builder().build();
         button_clone.set_child(Some(&spinner));
         let error_label = self.error_label.get();
+        let window = self.instance().clone();        
 
         glib::spawn_future_local(async move {
             while let Ok(response) = receiver.recv().await {
@@ -115,6 +117,10 @@ impl LoginWindow {
                     let mut str_classes: Vec<&str> = classes.iter().map(|gstring| gstring.as_str()).collect();
                     str_classes.push(&"error");
                     entry_clone.set_css_classes(&str_classes);
+                }
+                else {
+                    let dialog = RememberAccountDialog::new();
+                    AdwDialogExt::present(&dialog, Some(&window.root().unwrap()));
                 }
             }
         });

@@ -2,5 +2,6 @@
 <gresources>
     <gresource prefix="/com/github/vresian/harmony">
         <file compressed="true" preprocess="xml-stripblanks">login_window.ui</file>
+        <file compressed="true" preprocess="xml-stripblanks">remember_account_dialog.ui</file>
     </gresource>
 </gresources>

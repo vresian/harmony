@@ -1,4 +1,4 @@
-mod imp;
+pub mod imp;
 
 use adw::Application;
 use adw::{gio, glib};
