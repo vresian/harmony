@@ -21,3 +21,8 @@
     margin-top: 24px;
     padding: 12px 0;
 }
+
+.login_window .error_label {
+    margin-top: 8px;
+    margin-left: 4px;
+}

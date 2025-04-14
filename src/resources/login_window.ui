@@ -39,7 +39,16 @@
                                                 <style> <class name="token_entry"/> </style>
                                             </object>
                                         </child>
-                                        
+
+                                        <child>
+                                            <object class="GtkLabel" id="error_label">
+                                                <property name="label">Invalid token</property>
+                                                <property name="halign">start</property>
+                                                <property name="visible">false</property>
+                                                <style> <class name="error"/> <class name="error_label"/> </style>
+                                            </object>
+                                        </child>
+
                                         <child>
                                             <object class="GtkButton" id="log_in_button">
                                                 <signal name="clicked" handler="handle_log_in_attempt" swapped="true"/>
