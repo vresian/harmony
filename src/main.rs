@@ -13,14 +13,17 @@ fn build_ui(app: &Application) {
     window.present();
 }
 
-fn load_css() {
-    let provider = CssProvider::new();
-    provider.load_from_string(include_str!("styles/login_window.css"));
+fn load_css_files(paths: Vec<&str>) {
+    let screen = gdk::Display::default().expect("Could not connect to a display");
 
-    gtk::style_context_add_provider_for_display(
-        &gdk::Display::default().expect("Could not connect to a display"), 
-        &provider, adw::gtk::STYLE_PROVIDER_PRIORITY_APPLICATION
-    );
+    for path in paths {
+        let provider = CssProvider::new();
+        provider.load_from_string(path);
+
+        gtk::style_context_add_provider_for_display(
+            &screen, &provider, adw::gtk::STYLE_PROVIDER_PRIORITY_APPLICATION
+        )
+    }
 }
 
 fn main() {
@@ -30,7 +33,10 @@ fn main() {
         .application_id(APP_ID)
         .build();
     
-    app.connect_startup(|_| load_css());
+    app.connect_startup(|_| load_css_files(vec![
+        include_str!("styles/login_window.css"),
+        include_str!("styles/remember_account_dialog.css")
+    ]));
     app.connect_activate(build_ui);
 
     app.run();

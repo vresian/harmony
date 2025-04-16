@@ -1,3 +1,15 @@
+use adw::gtk::gdk::Texture;
+use adw::glib::Bytes;
+use tokio::runtime::Runtime;
+use std::sync::OnceLock;
+
+pub fn runtime() -> &'static Runtime {
+    static RUNTIME: OnceLock<Runtime> = OnceLock::new();
+    RUNTIME.get_or_init(|| {
+        Runtime::new().expect("Setting up tokio runtime needs to succeed.")
+    })
+}
+
 pub struct DiscordConnection {
     pub token: String
 }
@@ -28,5 +40,19 @@ impl DiscordConnection {
         let json_data = serde_json::from_str(response_text.as_str()).unwrap();
 
         Ok(json_data)
+    }
+
+    pub async fn get_profile_picture(avatar: String, user_id: String, size: i16) -> Result<Texture, std::io::Error> {
+        let client = reqwest::Client::new();        
+        let avatar_url = format!("https://cdn.discordapp.com/avatars/{user_id}/{avatar}.jpg?size={}", size);
+
+        let response = client
+            .get(avatar_url)
+            .send()
+            .await;
+        
+        let image_bytes = response.unwrap().bytes().await.unwrap().to_vec();
+
+        Ok(Texture::from_bytes(&Bytes::from(&image_bytes)).unwrap())
     }
 }

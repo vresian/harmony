@@ -1,18 +1,10 @@
-use std::sync::OnceLock;
 use glib::clone;
 use adw::prelude::*;
 use adw::subclass::prelude::*;
 use gtk::{glib::{self, subclass::InitializingObject}, CompositeTemplate};
-use tokio::runtime::Runtime;
 use crate::logic::remember_account_dialog::RememberAccountDialog;
 use crate::api::discord_connection::DiscordConnection;
-
-fn runtime() -> &'static Runtime {
-    static RUNTIME: OnceLock<Runtime> = OnceLock::new();
-    RUNTIME.get_or_init(|| {
-        Runtime::new().expect("Setting up tokio runtime needs to succeed.")
-    })
-}
+use crate::api::discord_connection::runtime;
 
 #[derive(CompositeTemplate, Default)]
 #[template(resource = "/com/github/vresian/harmony/login_window.ui")]
@@ -91,8 +83,8 @@ impl LoginWindow {
 
                     match response {
                         Ok(data) => {
-                            println!("{}", data["username"]);
                             let dialog = RememberAccountDialog::new();
+                            dialog.pass_data(data, dc_conn);
                             AdwDialogExt::present(&dialog, Some(&window.root().unwrap()));
                         },
                         Err(message) => {

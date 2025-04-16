@@ -1,0 +1,18 @@
+.remember_account_dialog .header {
+    font-size: 200%;
+    font-weight: bold;
+    margin: 32px 0;
+}
+
+.remember_account_dialog .global_name_label {
+    font-size: 150%;
+    font-weight: bold;
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+.remember_account_dialog .username_label {
+    font-size: 125%;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
