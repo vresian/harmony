@@ -6,7 +6,6 @@ use gtk::{glib::{self, subclass::InitializingObject}, CompositeTemplate};
 use tokio::runtime::Runtime;
 use crate::logic::remember_account_dialog::RememberAccountDialog;
 use crate::api::discord_connection::DiscordConnection;
-use std::sync::{Arc, Mutex};
 
 fn runtime() -> &'static Runtime {
     static RUNTIME: OnceLock<Runtime> = OnceLock::new();
@@ -46,31 +45,7 @@ impl ObjectSubclass for LoginWindow {
 impl LoginWindow {
     #[template_callback]
     fn handle_log_in_attempt(&self, _: &gtk::Button) {
-        self.error_label.set_label(" ");
-        self.log_in_button.set_sensitive(false);
-
         let token = self.token_entry.get().text().to_string();
-        let classes = self.token_entry.get().css_classes();
-
-        let mut classes_str: Vec<&str> = classes
-            .iter()
-            .map(|gstring| gstring.as_str())
-            .filter(|string| string != &"error")
-            .collect();
-        
-        if token.is_empty() {
-            classes_str.push(&"error");
-            self.error_label.set_visible(true);
-            self.error_label.set_label("Authorization token is required duh");
-            self.log_in_button.set_sensitive(true);
-            return self.token_entry.get().set_css_classes(classes_str.as_slice());
-        }
-        
-        self.token_entry.set_css_classes(&classes_str);
-
-        let button_label_pre_change = self.log_in_button.label().unwrap();
-
-        self.log_in_button.set_child(Some(&adw::Spinner::builder().build()));
 
         let (sender, receiver) = async_channel::bounded(1);
 
@@ -94,10 +69,26 @@ impl LoginWindow {
             #[weak(rename_to = token_entry)] self.token_entry.get(),
             #[weak(rename_to = window)] self.obj(),
             async move {
+                let button_label_pre_change = log_in_button.label().unwrap();
+                log_in_button.set_child(Some(&adw::Spinner::builder().build()));
+                log_in_button.set_sensitive(false);
+
+                error_label.set_label("");
+
+                let classes = token_entry.css_classes();
+
+                let mut classes_str: Vec<&str> = classes
+                    .iter()
+                    .map(|gstring| gstring.as_str())
+                    .filter(|string| string != &"error")
+                    .collect();
+
+                token_entry.set_css_classes(&classes_str);
+
                 if let Ok((dc_conn, response)) = receiver.recv().await {
                     log_in_button.set_label(button_label_pre_change.as_str()); 
                     log_in_button.set_sensitive(true);
-                    
+
                     match response {
                         Ok(data) => {
                             println!("{}", data["username"]);
@@ -107,10 +98,8 @@ impl LoginWindow {
                         Err(message) => {
                             error_label.set_label(message.as_str());
                             error_label.set_visible(true);
-                            let classes = token_entry.css_classes();
-                            let mut str_classes: Vec<&str> = classes.iter().map(|gstring| gstring.as_str()).collect();
-                            str_classes.push(&"error");
-                            token_entry.set_css_classes(&str_classes);                       
+                            classes_str.push(&"error");
+                            token_entry.set_css_classes(&classes_str);                       
                         }
                     }
                 }

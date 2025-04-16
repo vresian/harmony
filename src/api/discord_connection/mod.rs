@@ -8,6 +8,8 @@ impl DiscordConnection {
     }
 
     pub async fn init(&self) -> Result<serde_json::Value, String> {
+        if self.token.is_empty() { return Err(String::from("Authorization token cannot be empty")) }
+
         let client = reqwest::Client::new();
 
         let response = client
