@@ -4,7 +4,9 @@ use adw::prelude::*;
 use adw::subclass::prelude::*;
 use gtk::{glib::{self, subclass::InitializingObject}, CompositeTemplate};
 use tokio::runtime::Runtime;
-use crate::logic::remember_account_dialog::{self, RememberAccountDialog};
+use crate::logic::remember_account_dialog::RememberAccountDialog;
+use crate::api::discord_connection::DiscordConnection;
+use std::sync::{Arc, Mutex};
 
 fn runtime() -> &'static Runtime {
     static RUNTIME: OnceLock<Runtime> = OnceLock::new();
@@ -63,67 +65,57 @@ impl LoginWindow {
             self.log_in_button.set_sensitive(true);
             return self.token_entry.get().set_css_classes(classes_str.as_slice());
         }
-
-        self.token_entry.set_css_classes(&classes_str);
         
+        self.token_entry.set_css_classes(&classes_str);
+
+        let button_label_pre_change = self.log_in_button.label().unwrap();
+
+        self.log_in_button.set_child(Some(&adw::Spinner::builder().build()));
+
         let (sender, receiver) = async_channel::bounded(1);
 
         runtime().spawn(clone!(
             #[strong]
             sender,
-            async move {
-                let client = reqwest::Client::new();
-
-                let response = client
-                    .get("https://discord.com/api/v9/users/@me")
-                    .header(reqwest::header::AUTHORIZATION, token)
-                    .send()
-                    .await;
+            async move { 
+                let dc_conn = DiscordConnection::new(token);
+                let response = dc_conn.init().await;
 
                 sender
-                    .send(response)
+                    .send((dc_conn, response))
                     .await
                     .expect("The channel needs to be open.");
             }
         ));
 
-        let entry_clone = self.token_entry.get();
-        let button_clone = self.log_in_button.get();
-        let button_label = button_clone.label().unwrap();
-        button_clone.set_label("");
-        let spinner = adw::Spinner::builder().build();
-        button_clone.set_child(Some(&spinner));
-        let error_label = self.error_label.get();
-        let window = self.instance().clone();        
-
-        glib::spawn_future_local(async move {
-            while let Ok(response) = receiver.recv().await {
-                button_clone.set_label(button_label.as_str()); 
-                button_clone.set_sensitive(true);
-
-                let mut error = "";
-
-                if !response.is_ok() { error = "Couldn't make a GET request" }
-                else {
-                    let status = response.as_ref().unwrap().status();
-                    if status.is_client_error() { error = "Invalid authorization token" }
-                    else if status.is_server_error() { error = "Encountered a discord server error" }
-                }
-                
-                if !error.is_empty() {
-                    error_label.set_label(error);
-                    error_label.set_visible(true);
-                    let classes = entry_clone.css_classes();
-                    let mut str_classes: Vec<&str> = classes.iter().map(|gstring| gstring.as_str()).collect();
-                    str_classes.push(&"error");
-                    entry_clone.set_css_classes(&str_classes);
-                }
-                else {
-                    let dialog = RememberAccountDialog::new();
-                    AdwDialogExt::present(&dialog, Some(&window.root().unwrap()));
+        glib::spawn_future_local(clone!(
+            #[weak(rename_to = error_label)] self.error_label.get(),
+            #[weak(rename_to = log_in_button)] self.log_in_button.get(),
+            #[weak(rename_to = token_entry)] self.token_entry.get(),
+            #[weak(rename_to = window)] self.obj(),
+            async move {
+                if let Ok((dc_conn, response)) = receiver.recv().await {
+                    log_in_button.set_label(button_label_pre_change.as_str()); 
+                    log_in_button.set_sensitive(true);
+                    
+                    match response {
+                        Ok(data) => {
+                            println!("{}", data["username"]);
+                            let dialog = RememberAccountDialog::new();
+                            AdwDialogExt::present(&dialog, Some(&window.root().unwrap()));
+                        },
+                        Err(message) => {
+                            error_label.set_label(message.as_str());
+                            error_label.set_visible(true);
+                            let classes = token_entry.css_classes();
+                            let mut str_classes: Vec<&str> = classes.iter().map(|gstring| gstring.as_str()).collect();
+                            str_classes.push(&"error");
+                            token_entry.set_css_classes(&str_classes);                       
+                        }
+                    }
                 }
             }
-        });
+        ));
     }
 }
 

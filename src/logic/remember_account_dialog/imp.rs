@@ -30,5 +30,4 @@ impl ObjectImpl for RememberAccountDialog {
 
 impl WidgetImpl for RememberAccountDialog {}
 impl WindowImpl for RememberAccountDialog {}
-impl DialogImpl for RememberAccountDialog {}
 impl AdwDialogImpl for RememberAccountDialog {}

@@ -1,8 +1,9 @@
 mod logic;
+mod api;
 
 use logic::login_window::LoginWindow;
 use adw::prelude::*;
-use adw::{Application, ApplicationWindow, gio, gtk::{CssProvider, gdk}};
+use adw::{Application, gio, gtk::{CssProvider, gdk}};
 
 const APP_ID: &'static str = "com.github.vresian.harmony";
 

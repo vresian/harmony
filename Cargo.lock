@@ -568,6 +568,7 @@ dependencies = [
  "gtk4",
  "libadwaita",
  "reqwest",
+ "serde_json",
  "tokio",
 ]
 
